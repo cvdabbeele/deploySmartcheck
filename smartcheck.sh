@@ -21,7 +21,7 @@ cat << EOF > work/req.conf
 [req]
   distinguished_name=req
 [san]
-  subjectAltName=DNS:*.${AWS_REGION}.elb.amazonaws.com
+  subjectAltName=DNS:${DSSC_SUBJECTALTNAME}
 EOF
 
     NAMESPACES=`kubectl get namespaces`
