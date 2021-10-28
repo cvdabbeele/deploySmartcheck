@@ -1,7 +1,7 @@
 #!/bin/bash
 
 printf '%s\n' "--------------------------------------------------"
-printf '%s\n' "     Adding internal repository to SmartCheck     "
+printf '%s\n' "     Adding internal registry to SmartCheck     "
 printf '%s\n' "--------------------------------------------------"
 
 varsok=true
