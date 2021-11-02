@@ -11,8 +11,9 @@ HELM_DEPLOYMENTS=
 if [[ "`helm list -n ${DSSC_NAMESPACE} -o json | jq -r '.[].name'`" =~ 'deepsecurity-smartcheck' ]];
   then
     # found an existing DSSC
+    [ ${VERBOSE} -eq 1 ] && printf "%s\n" "Found existing SmartCheck"
     #checking if we can get a bearertoken
-    [ ${VERBOSE} -eq 1 ] && printf "\n%s\n" "Getting Bearer token"
+    [ ${VERBOSE} -eq 1 ] && printf "%s\n" "Getting a Bearer token"
     DSSC_BEARERTOKEN=''
     DSSC_BEARERTOKEN=$(curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_PASSWORD}\"}}" | jq '.token' | tr -d '"')
     [ ${VERBOSE} -eq 1 ] && printf "\n%s\n" "Bearer Token = ${DSSC_BEARERTOKEN}"
@@ -25,7 +26,7 @@ if [[ "`helm list -n ${DSSC_NAMESPACE} -o json | jq -r '.[].name'`" =~ 'deepsecu
       printf "%s" "Uninstalling existing (and broken) smartcheck... "
       helm delete deepsecurity-smartcheck -n ${DSSC_NAMESPACE}
     fi
-    else
+  else
       # (re-)install smartcheck 
       #get certificate for internal registry
       #-------------------------------------
