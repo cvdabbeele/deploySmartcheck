@@ -147,16 +147,19 @@ EOF
   export DSSC_BEARERTOKEN=''
   while [[ "$DSSC_BEARERTOKEN" == '' ]];do
     sleep 5
-    export DSSC_USERID=`curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/  json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"$  {DSSC_USERNAME}\",\"password\":\"${DSSC_TEMPPW}\"}}" | jq '.user.id'  2>/dev/null | tr -d '"' `
-        export DSSC_BEARERTOKEN=`curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/  json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"$  {DSSC_USERNAME}\",\"password\":\"${DSSC_TEMPPW}\"}}" | jq '.token' 2>/dev/null | tr -d '"'  `
+    export DSSC_BEARERTOKEN=`curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/  json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_TEMPPW}\"}}" | jq '.token' 2>/dev/null | tr -d '"'  `
         printf '%s' "."
   done
+  export DSSC_USERID=`curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/  json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_TEMPPW}\"}}" | jq '.user.id'  2>/dev/null | tr -d '"' `
+  [ ${VERBOSE} -eq 1 ] && printf "%s\n" "DSSC_BEARERTOKEN=${DSSC_BEARERTOKEN}"
+  [ ${VERBOSE} -eq 1 ] && printf "%s\n" "DSSC_USERID=${DSSC_USERID}"
+  
   printf '%s \n' " "
      
   # do mandatory initial password change
   #----------------------------------------
   printf '%s \n' "Doing initial (required) password change"
-  DUMMY=`curl -s -k -X POST https://${DSSC_HOST}/api/users/${DSSC_USERID}/password -H "Content-Type:   application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -H "authorization: Bearer $  {DSSC_BEARERTOKEN}" -d "{  \"oldPassword\": \"${DSSC_TEMPPW}\", \"newPassword\": \"${DSSC_PASSWORD}\"  }"`
+  DUMMY=`curl -s -k -X POST https://${DSSC_HOST}/api/users/${DSSC_USERID}/password -H "Content-Type:   application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -H "authorization: Bearer ${DSSC_BEARERTOKEN}" -d "{  \"oldPassword\": \"${DSSC_TEMPPW}\", \"newPassword\": \"${DSSC_PASSWORD}\"  }"`
   printf '%s \n' "SmartCheck is available at: "
   printf '%s \n' "--------------------------------------------------"
   printf '%s \n' "     URL: https://${DSSC_HOST}"
