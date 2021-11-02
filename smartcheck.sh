@@ -7,7 +7,6 @@ printf '%s\n' "------------------------------------------"
 
 # If no smartcheck deployment found, deploy it 
 # ----------------------------------------------
-HELM_DEPLOYMENTS=
 if [[ "`helm list -n ${DSSC_NAMESPACE} -o json | jq -r '.[].name'`" =~ 'deepsecurity-smartcheck' ]];
   then
     # found an existing DSSC
