@@ -17,7 +17,7 @@ fi
 [ ${VERBOSE} -eq 1 ] && printf "\n%s\n" "Getting Bearer token"
 [ ${VERBOSE} -eq 1 ] && curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_PASSWORD}\"}}"
 DSSC_BEARERTOKEN=$(curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_PASSWORD}\"}}" | jq '.token' | tr -d '"')
-[ ${VERBOSE} -eq 1 ] && printf "\n%s\n" "Bearer Token = ${DSSC_BEARERTOKEN} \n"
+[ ${VERBOSE} -eq 1 ] && printf "\n%s\n" "Bearer Token = ${DSSC_BEARERTOKEN}"
 
 # Adding internal registry to SmartCheck:
 # ------------------------------------------
