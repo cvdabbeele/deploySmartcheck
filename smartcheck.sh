@@ -125,7 +125,7 @@ EOF
   export DSSC_HOST=''
   export DSSC_HOST_RAW=''
   while [[ "$DSSC_HOST_RAW" == '' ]];do
-    export DSSC_HOST_RAW=`kubectl get svc -n ${DSSC_NAMESPACE} proxy -o json | jq -r "${DSSC_HOST_FILTER}" 2>/  dev/null`
+    export DSSC_HOST_RAW=`kubectl get svc -n ${DSSC_NAMESPACE} proxy -o json | jq -r "${DSSC_HOST_FILTER}" 2>/dev/null`
     sleep 10
     printf "%s" "."
   done
