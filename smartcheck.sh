@@ -102,10 +102,11 @@ vulnerabilityScan:
     cpu: 1000m
     memory: 3Gi
 EOF
-
+    
     printf '%s' "Deploying SmartCheck Helm chart..."
     helm install -n ${DSSC_NAMESPACE} --values ${WORKDIR}/overrides.yml deepsecurity-smartcheck https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz > /dev/null
     export DSSC_HOST=''
+    export DSSC_HOST_RAW=''
     while [[ "$DSSC_HOST_RAW" == '' ]];do
       export DSSC_HOST_RAW=`kubectl get svc -n ${DSSC_NAMESPACE} proxy -o json | jq -r "${DSSC_HOST_FILTER}" 2>/dev/null`
       sleep 10
@@ -121,7 +122,7 @@ EOF
     printf '\n%s' "Waiting for SmartCheck Service to come online: ."
     export DSSC_BEARERTOKEN=''
     while [[ "$DSSC_BEARERTOKEN" == '' ]];do
-      sleep 10
+      sleep 5
       export DSSC_USERID=`curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_TEMPPW}\"}}" | jq '.user.id'  2>/dev/null | tr -d '"' `
       export DSSC_BEARERTOKEN=`curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_TEMPPW}\"}}" | jq '.token' 2>/dev/null | tr -d '"'  `
       printf '%s' "."
