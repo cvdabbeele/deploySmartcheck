@@ -12,6 +12,8 @@ if [[ "`helm list -n ${DSSC_NAMESPACE} -o json | jq -r '.[].name'`" =~ 'deepsecu
     [ ${VERBOSE} -eq 1 ] && printf "%s\n" "Found existing SmartCheck"
     #checking if we can get a bearertoken
     export DSSC_HOST=`kubectl get services proxy -n $DSSC_NAMESPACE -o json | jq -r "${DSSC_HOST_FILTER}"`
+    [[ "${PLATFORM}" == "AZURE" ]] &&  export DSSC_HOST=${DSSC_HOST//./-}.nip.io
+    [[ "${PLATFORM}" == "AWS" ]]  && export DSSC_HOST=${DSSC_HOST_RAW}
     [ ${VERBOSE} -eq 1 ] && printf "%s\n" "Getting a Bearer token"
     DSSC_BEARERTOKEN=''
     DSSC_BEARERTOKEN=$(curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_PASSWORD}\"}}" | jq '.token' | tr -d '"')
@@ -21,6 +23,8 @@ if [[ "`helm list -n ${DSSC_NAMESPACE} -o json | jq -r '.[].name'`" =~ 'deepsecu
         export EXISTINGSMARTCHECKOK="true"
         printf '%s\n' "Reusing existing Smart Check deployment"
         export DSSC_HOST=`kubectl get services proxy -n $DSSC_NAMESPACE -o json | jq -r "${DSSC_HOST_FILTER}"`
+        [[ "${PLATFORM}" == "AZURE" ]] &&  export DSSC_HOST=${DSSC_HOST//./-}.nip.io
+        [[ "${PLATFORM}" == "AWS" ]]  && export DSSC_HOST=${DSSC_HOST_RAW}
     else  
       #existing DSSC found, but could not get a Bearertoken -> delete existing DSSC
       printf "%s" "Uninstalling existing (and broken) smartcheck... "
@@ -136,12 +140,8 @@ EOF
     sleep 10
     printf "%s" "."
   done
-  if [[ "${PLATFORM}" == "AZURE" ]]; then
-    export DSSC_HOST=${DSSC_HOST_RAW//./-}.nip.io
-  fi
-  if [[ "${PLATFORM}" == "AWS" ]]; then
-    export DSSC_HOST=${DSSC_HOST_RAW}
-  fi
+  [[ "${PLATFORM}" == "AZURE" ]] &&  export DSSC_HOST=${DSSC_HOST_RAW//./-}.nip.io
+  [[ "${PLATFORM}" == "AWS" ]]  && export DSSC_HOST=${DSSC_HOST_RAW}
   [ ${VERBOSE} -eq 1 ] && printf "\n%s\n" "DSSC_HOST=${DSSC_HOST}"
   printf '\n%s' "Waiting for SmartCheck Service to come online: ."
   export DSSC_BEARERTOKEN=''

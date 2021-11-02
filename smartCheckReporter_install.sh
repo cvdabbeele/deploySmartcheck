@@ -24,7 +24,7 @@ echo ${ACR_URL}
 echo ${ACR_USERNAME}
 echo ${ACR_PASSWORD}
 
-cat <<EOF>config.yml
+cat <<EOF >config.yml
 dssc:
   service: "${DSSC_HOST}:443"
   username: "${DSSC_USERNAME}"
@@ -41,6 +41,7 @@ criticalities:
   - high
   - medium
 EOF
+
 cat config.yml
 
 python3 scan-report.py
@@ -55,6 +56,8 @@ cd $PREVIOUS_DIR
 #-----------------------
 source ~/environment/cloudOneOnAws/00_define_vars.sh
 export DSSC_HOST=`kubectl get service proxy  -n smartcheck -o json |jq -r ".status.loadBalancer.ingress[].hostname"`
+[[ "${PLATFORM}" == "AZURE" ]] &&  export DSSC_HOST=${DSSC_HOST//./-}.nip.io
+[[ "${PLATFORM}" == "AWS" ]]  && export DSSC_HOST=${DSSC_HOST_RAW}
 echo $DSSC_HOST
 
 DSSC_BEARERTOKEN=$(curl -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_PASSWORD}\"}}" | jq '.token' | tr -d '"')
