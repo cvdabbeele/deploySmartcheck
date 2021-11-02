@@ -25,6 +25,13 @@ if [[ "`helm list -n ${DSSC_NAMESPACE} -o json | jq -r '.[].name'`" =~ 'deepsecu
       #existing DSSC found, but could not get a Bearertoken -> delete existing DSSC
       printf "%s" "Uninstalling existing (and broken) smartcheck... "
       helm delete deepsecurity-smartcheck -n ${DSSC_NAMESPACE}
+      printf '\n%s' "Waiting for SmartCheck pods to be deleted"
+      export NROFPODS=`kubectl get pods -A | grep -c smartcheck`
+      while [[ "${NROFPODS}" -gt "0" ]];do
+        sleep 5
+        export NROFPODS=`kubectl get pods -A | grep -c smartcheck`
+        printf '%s' "."
+      done
     fi
 fi
 
