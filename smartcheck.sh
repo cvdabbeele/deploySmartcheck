@@ -107,7 +107,7 @@ EOF
     helm install -n ${DSSC_NAMESPACE} --values work/overrides.yml deepsecurity-smartcheck https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz > /dev/null
     export DSSC_HOST=''
     while [[ "$DSSC_HOST_RAW" == '' ]];do
-      export DSSC_HOST_RAW=${`kubectl get svc -n ${DSSC_NAMESPACE} proxy -o json | jq -r "${DSSC_HOST_FILTER}" 2>/dev/null`//./_}
+      export DSSC_HOST_RAW=`kubectl get svc -n ${DSSC_NAMESPACE} proxy -o json | jq -r "${DSSC_HOST_FILTER}" 2>/dev/null`
       sleep 10
       printf "%s" "."
     done
