@@ -10,15 +10,20 @@ printf '%s\n' "------------------------------------------"
 HELM_DEPLOYMENTS=
 if [[ "`helm list -n ${DSSC_NAMESPACE} -o json | jq -r '.[].name'`" =~ 'deepsecurity-smartcheck' ]];
   then
-    #checking if we can get a bearertoken
+    # found an existing smartcheck deployment
+    # checking if we can get a bearertoken
     [ ${VERBOSE} -eq 1 ] && printf "\n%s\n" "Getting Bearer token"
     DSSC_BEARERTOKEN=''
     DSSC_BEARERTOKEN=$(curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_PASSWORD}\"}}" | jq '.token' | tr -d '"')
     [ ${VERBOSE} -eq 1 ] && printf "\n%s\n" "Bearer Token = ${DSSC_BEARERTOKEN}"
     if [[ ! -z "${DSSC_BEARERTOKEN}" ]]; then
-        printf '%s\n' "Reusing existing Smart Check deployment"
-        export DSSC_HOST=`kubectl get services proxy -n $DSSC_NAMESPACE -o json | jq -r "${DSSC_HOST_FILTER}"`
+      # found deployment and can get a Bearertoken: this is a valid deployment
+      printf '%s\n' "Reusing existing Smart Check deployment"
+      export DSSC_HOST=`kubectl get services proxy -n $DSSC_NAMESPACE -o json | jq -r "${DSSC_HOST_FILTER}"`
     else
+      # found DSSC deployment, but could not get Bearertoken -> invalid deployment
+      printf "%s" "Uninstalling old (and broken) smartcheck... "
+      helm delete deepsecurity-smartcheck -n ${DSSC_NAMESPACE}      
       #get certificate for internal registry
       #-------------------------------------
 cat << EOF > ${WORKDIR}/req.conf
