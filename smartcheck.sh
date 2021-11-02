@@ -106,11 +106,18 @@ EOF
     printf '%s' "Deploying SmartCheck Helm chart..."
     helm install -n ${DSSC_NAMESPACE} --values work/overrides.yml deepsecurity-smartcheck https://github.com/deep-security/smartcheck-helm/archive/master.tar.gz > /dev/null
     export DSSC_HOST=''
-    while [[ "$DSSC_HOST" == '' ]];do
-      export DSSC_HOST=`kubectl get svc -n ${DSSC_NAMESPACE} proxy -o json | jq -r "${DSSC_HOST_FILTER}" 2>/dev/null`
+    while [[ "$DSSC_HOST_RAW" == '' ]];do
+      export DSSC_HOST_RAW=${`kubectl get svc -n ${DSSC_NAMESPACE} proxy -o json | jq -r "${DSSC_HOST_FILTER}" 2>/dev/null`//./_}
       sleep 10
       printf "%s" "."
     done
+    if [[ "${PLATFORM}" == "AZURE" ]]; then
+      export DSSC_HOST=${DSSC_HOST_RAW//./-}
+    fi
+    if [[ "${PLATFORM}" == "AWS" ]]; then
+      export DSSC_HOST=${DSSC_HOST_RAW}
+    fi
+    [ ${VERBOSE} -eq 1 ] && printf "\n%s\n" "DSSC_HOST=${DSSC_HOST}"
     printf '\n%s' "Waiting for SmartCheck Service to come online: ."
     export DSSC_BEARERTOKEN=''
     while [[ "$DSSC_BEARERTOKEN" == '' ]];do
