@@ -13,10 +13,11 @@ if [[ "`helm list -n ${DSSC_NAMESPACE} -o json | jq -r '.[].name'`" =~ 'deepsecu
     # found an existing DSSC
     [ ${VERBOSE} -eq 1 ] && printf "%s\n" "Found existing SmartCheck"
     #checking if we can get a bearertoken
+    export DSSC_HOST=`kubectl get services proxy -n $DSSC_NAMESPACE -o json | jq -r "${DSSC_HOST_FILTER}"`
     [ ${VERBOSE} -eq 1 ] && printf "%s\n" "Getting a Bearer token"
     DSSC_BEARERTOKEN=''
     DSSC_BEARERTOKEN=$(curl -s -k -X POST https://${DSSC_HOST}/api/sessions -H "Content-Type: application/json"  -H "Api-Version: 2018-05-01" -H "cache-control: no-cache" -d "{\"user\":{\"userid\":\"${DSSC_USERNAME}\",\"password\":\"${DSSC_PASSWORD}\"}}" | jq '.token' | tr -d '"')
-    [ ${VERBOSE} -eq 1 ] && printf "\n%s\n" "Bearer Token = ${DSSC_BEARERTOKEN}"
+    [ ${VERBOSE} -eq 1 ] && printf "%s\n" "Bearer Token = ${DSSC_BEARERTOKEN}"
     if [[ ! -z "${DSSC_BEARERTOKEN}" ]]; then
         # existing DSSC + can get a Bearertoken
         printf '%s\n' "Reusing existing Smart Check deployment"
