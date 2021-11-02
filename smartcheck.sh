@@ -112,7 +112,7 @@ EOF
       printf "%s" "."
     done
     if [[ "${PLATFORM}" == "AZURE" ]]; then
-      export DSSC_HOST=${DSSC_HOST_RAW//./-}
+      export DSSC_HOST=${DSSC_HOST_RAW//./-}.nip.io
     fi
     if [[ "${PLATFORM}" == "AWS" ]]; then
       export DSSC_HOST=${DSSC_HOST_RAW}
