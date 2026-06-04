@@ -1,3 +1,5 @@
+# **This project has been deprecated in June 2022**
+
 # deploySmartcheck
 This repo is used by CloudOneOnAws and by CloudOneOnAzure
 It is not intended to be used stand-alone.  
